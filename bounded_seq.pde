@@ -98,32 +98,9 @@ void draw() {
   // you need to call updatePixels() to display
   // the colors stored in the pixels[] array.
   updatePixels();
+  
+  // save a copy of the rendering in the sketch folder
   save("mandelbrot.tif");
-}
-
-/**
- * Mouse Click Action
- */
-void mousePressed() {
-  loadPixels();
-  // LEFT CLICK
-  // Change the color of the set by a random value between 0-255
-  if (mousePressed && (mouseButton == LEFT)) {
-    r = random(255);
-    for (int i = 0; i < width*height; i++) {
-      if (pixels[i] != color(0)) {
-        pixels[i] = pixels[i] + (int) r;
-      }
-    }
-    updatePixels();
-  }
-
-  // RIGHT CLICK
-  // redraw the set with double the number of iterations
-  if (mousePressed && (mouseButton == RIGHT)) {
-    iterations = iterations * 2; 
-    draw();
-  }
 }
 
 // method to check if the sequence is bounded. x 
@@ -161,6 +138,34 @@ int checkBounded(double x, double y) {
   // sequence is bounded for the particular
   // value of c and return 0 as a result.
   return 0;
+}
+
+/**
+ * Mouse Click Action
+ * The left click will change the colors in the array except for the black ones
+ * The right click will double the iterations and redraw the fractal. Color selection needs work, 
+ * may have to change to black and white for zoom features.
+ */
+void mousePressed() {
+  loadPixels();
+  // LEFT CLICK
+  // Change the color of the set by a random value between 0-255
+  if (mousePressed && (mouseButton == LEFT)) {
+    r = random(255);
+    for (int i = 0; i < width*height; i++) {
+      if (pixels[i] != color(0)) {
+        pixels[i] = pixels[i] + (int) r;
+      }
+    }
+    updatePixels();
+  }
+
+  // RIGHT CLICK
+  // redraw the set with double the number of iterations
+  if (mousePressed && (mouseButton == RIGHT)) {
+    iterations = iterations * 2; 
+    draw();
+  }
 }
 
 // Handle keyboard input
