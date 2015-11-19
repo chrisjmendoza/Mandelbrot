@@ -35,7 +35,7 @@ float r = random(255);
 
 void setup() {
   // be sure to fill in the size method
-  size(28800, 16200);
+  size(1024, 564);
   // HSB stands for hue, saturation, and brightness
   colorMode(HSB);
   // we are only writing to the display window once
@@ -44,7 +44,7 @@ void setup() {
   background(255);
 
   // set the number of iterations
-  iterations = 100000;
+  iterations = 100;
 
   // here we decide what our discrete
   // infinity will be
@@ -55,11 +55,11 @@ void setup() {
   xmax = 1.6;
   ymin = -1.35;
   ymax = 1.35;
+  // dx and dy should be defined using the 
+  // height and width keywords.
 }
 
 void draw() {
-  // dx and dy should be defined using the 
-  // height and width keywords.
   dx = Math.abs(xmax - xmin) / width;
   dy = Math.abs(ymax - ymin) / height;
   // to use the pixels[] array you need to first 
@@ -68,7 +68,7 @@ void draw() {
 
   iterationCount = 0;
   double x = xmin;
-  for (int i = 0; i < width; i++) {
+  for (int i = 0; i < width; i+=3) {
     double y = ymin;
     for (int j = 0; j < height; j++) {
       // a and b represent the current value of c
@@ -86,21 +86,97 @@ void draw() {
       pixels[i+j*width] = c;
       y+= dy;
     }
-    x+=dx;
-    int xProg = (int) (((x+3.2)/4.8) * 100);
-    System.out.println("Progress: " + xProg + "%.");
+    x+=dx * 3;
+    // draw the first set of columns?
+    updatePixels();
+    //int xProg = (int) ((Math.abs(x)/(Math.abs(xmin)+Math.abs(xmax))) * 100);
+    //System.out.println("Progress: " + xProg + "%.");
     //System.out.println("Current x: " + x);
-    //textSize(32);
-    //text(xProg, 10, 30); 
-    //fill(0, 102, 153);
+  }
+
+  x = xmin + dx;
+  for (int i = 1; i < width; i+=3) {
+    double y = ymin;
+    for (int j = 0; j < height; j++) {
+      // a and b represent the current value of c
+      // which depends on i and j. Here c = a + bi
+      a = x;
+      b = y;
+
+      // determine whether the sequence is bounded
+      // at the current value of c
+      iterationCount = checkBounded(a, b);
+
+      // write a color to the pixels[] array based
+      // on iterationCount
+      c = color(iterationCount * 2);
+      pixels[i+j*width] = c;
+      y+= dy;
+    }
+    x+=dx * 3;
+    // draw the second set of columns?
+    updatePixels();
+    //int xProg = (int) ((Math.abs(x)/(Math.abs(xmin)+Math.abs(xmax))) * 100);
+    //System.out.println("Progress: " + xProg + "%.");
+    //System.out.println("Current x: " + x);
+  }
+
+  x = xmin + (dx * 2);
+  for (int i = 2; i < width; i+=3) {
+    double y = ymin;
+    for (int j = 0; j < height; j++) {
+      // a and b represent the current value of c
+      // which depends on i and j. Here c = a + bi
+      a = x;
+      b = y;
+
+      // determine whether the sequence is bounded
+      // at the current value of c
+      iterationCount = checkBounded(a, b);
+
+      // write a color to the pixels[] array based
+      // on iterationCount
+      c = color(iterationCount * 2);
+      pixels[i+j*width] = c;
+      y+= dy;
+    }
+    x+=dx * 3;
+
+    // CONSOLE OUT PROGRESS INFORMATION -- SLOWS DOWN RENDERING
+    //int xProg = (int) ((Math.abs(x)/(Math.abs(xmin)+Math.abs(xmax))) * 100);
+    //System.out.println("Progress: " + xProg + "%.");
+    //System.out.println("Current x: " + x);
   }
 
   // you need to call updatePixels() to display
   // the colors stored in the pixels[] array.
   updatePixels();
-  
-  // save a copy of the rendering in the sketch folder
-  save("mandelbrot.tif");
+  //save("mandelbrot.tif");
+}
+
+/**
+ * Mouse Click Action
+ */
+void mousePressed() {
+  loadPixels();
+  // LEFT CLICK
+  // Change the color of the set by a random value between 0-255
+  if (mousePressed && (mouseButton == LEFT)) {
+    r = random(255);
+    for (int i = 0; i < width*height; i++) {
+      if (pixels[i] != color(0)) {
+        pixels[i] = pixels[i] + (int) r;
+      }
+    }
+    updatePixels();
+  }
+
+  // RIGHT CLICK
+  // redraw the set with double the number of iterations
+  if (mousePressed && (mouseButton == RIGHT)) {
+    iterations = iterations * 2; 
+    draw();
+  }
 }
 
 // method to check if the sequence is bounded. x 
@@ -140,34 +216,6 @@ int checkBounded(double x, double y) {
   return 0;
 }
 
-/**
- * Mouse Click Action
- * The left click will change the colors in the array except for the black ones
- * The right click will double the iterations and redraw the fractal. Color selection needs work, 
- * may have to change to black and white for zoom features.
- */
-void mousePressed() {
-  loadPixels();
-  // LEFT CLICK
-  // Change the color of the set by a random value between 0-255
-  if (mousePressed && (mouseButton == LEFT)) {
-    r = random(255);
-    for (int i = 0; i < width*height; i++) {
-      if (pixels[i] != color(0)) {
-        pixels[i] = pixels[i] + (int) r;
-      }
-    }
-    updatePixels();
-  }
-
-  // RIGHT CLICK
-  // redraw the set with double the number of iterations
-  if (mousePressed && (mouseButton == RIGHT)) {
-    iterations = iterations * 2; 
-    draw();
-  }
-}
-
 // Handle keyboard input
 void keyPressed() {
   // Precalculate 2% change for zooming and moving
@@ -192,7 +240,7 @@ void keyPressed() {
     ymin += yDelta;
   } else if (key == '=') {
     // Zoom-in view
-    ymax -= yDelta; //<>//
+    ymax -= yDelta;
     ymin += yDelta;
     xmax -= xDelta;
     xmin += xDelta;
@@ -203,4 +251,7 @@ void keyPressed() {
     xmax += xDelta;
     xmin -= xDelta;
   }
+
+  //Draw the new view
+  draw();
 }
