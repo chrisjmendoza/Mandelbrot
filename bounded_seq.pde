@@ -1,4 +1,4 @@
-/* AD 315
+/* AD 315 //<>//
  * Programming Assignment 3
  *
  * Determining whether sequences are
@@ -31,6 +31,9 @@ color c;
 // number to represent infinity5
 int infinity;
 
+// values for mouse selection
+int mx, my;
+
 float r = random(255);
 
 void setup() {
@@ -44,7 +47,7 @@ void setup() {
   background(255);
 
   // set the number of iterations
-  iterations = 100;
+  iterations = 1000;
 
   // here we decide what our discrete
   // infinity will be
@@ -82,7 +85,7 @@ void draw() {
 
       // write a color to the pixels[] array based
       // on iterationCount
-      c = color(iterationCount * 2);
+      c = color(iterationCount * 1000 % 255);
       pixels[i+j*width] = c;
       y+= dy;
     }
@@ -136,7 +139,7 @@ void draw() {
 
       // write a color to the pixels[] array based
       // on iterationCount
-      c = color(iterationCount * 2);
+      c = color(iterationCount * 3);
       pixels[i+j*width] = c;
       y+= dy;
     }
@@ -157,26 +160,41 @@ void draw() {
 /**
  * Mouse Click Action
  */
+//void mousePressed() {
+//  loadPixels();
+//  // LEFT CLICK
+//  // Change the color of the set by a random value between 0-255
+//  if (mousePressed && (mouseButton == LEFT)) {
+//    r = random(255);
+//    for (int i = 0; i < width*height; i++) {
+//      if (pixels[i] != color(0)) {
+//        pixels[i] = pixels[i] + (int) r;
+//      }
+//    }
+//    updatePixels();
+//  }
 void mousePressed() {
-  loadPixels();
-  // LEFT CLICK
-  // Change the color of the set by a random value between 0-255
-  if (mousePressed && (mouseButton == LEFT)) {
-    r = random(255);
-    for (int i = 0; i < width*height; i++) {
-      if (pixels[i] != color(0)) {
-        pixels[i] = pixels[i] + (int) r;
-      }
-    }
-    updatePixels();
+  if(mouseButton == LEFT) {
+  mx = mouseX;
+  my = mouseY;
   }
 
   // RIGHT CLICK
   // redraw the set with double the number of iterations
-  if (mousePressed && (mouseButton == RIGHT)) {
+  if ((mouseButton == RIGHT)) {
     iterations = iterations * 2; 
-    draw();
+    redraw();
   }
+}
+
+void mouseReleased() {
+  double nxmin= map(min(mouseX, mx), 0, width, (float)xmin, (float)xmax) ;
+  xmax= map(max(mouseX, mx), 0, width, (float)xmin, (float)xmax) ;
+  xmin = nxmin;
+  double nymin= map(min(mouseY, my), 0, height, (float)ymin, (float)ymax) ;
+  ymax= map(max(mouseY, my), 0, height, (float)ymin, (float)ymax) ;
+  ymin = nymin; 
+  redraw();
 }
 
 // method to check if the sequence is bounded. x 
